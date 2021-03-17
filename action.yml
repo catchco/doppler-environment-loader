@@ -7,11 +7,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - uses: DopplerHQ/cli-action@v1
-
     - name: Load Doppler secrets
       env:
         DOPPLER_TOKEN: ${{ inputs.doppler-token }}
+      shell: bash
       run: |
         content=$(doppler secrets download --no-file --format env-no-quotes)
         IFS=$'\n'
