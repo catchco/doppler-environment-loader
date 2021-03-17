@@ -1,0 +1,24 @@
+name: "Doppler Environment Loader"
+description: "Loads Doppler secrets into the environment as masked values"
+inputs:
+  doppler-token:
+    description: "The Doppler token of the project configuration to be loaded"
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - uses: DopplerHQ/cli-action@v1
+
+    - name: Load Doppler secrets
+      env:
+        DOPPLER_TOKEN: ${{ inputs.doppler-token }}
+      run: |
+        content=$(doppler secrets download --no-file --format env-no-quotes)
+        IFS=$'\n'
+        for line in $content; do
+            key=$(cut -d "=" -f1 <<< $line)
+            secret=$(cut -d "=" -f2- <<< $line)              
+            if [[ $key != DOPPLER* ]]; then echo "::add-mask::${secret}"; fi
+            echo "${key}=${secret}" >> $GITHUB_ENV
+        done
+        IFS=' '
