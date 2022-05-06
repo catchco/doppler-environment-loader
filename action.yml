@@ -18,6 +18,6 @@ runs:
             key=$(cut -d "=" -f1 <<< $line)
             secret=$(cut -d "=" -f2- <<< $line)              
             if [[ $key != DOPPLER* ]]; then echo "::add-mask::${secret}"; fi
-            echo "${key}=${secret}" >> $GITHUB_ENV
+            echo -n "${key}=${secret}" >> $GITHUB_ENV
         done
         IFS=' '
