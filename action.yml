@@ -16,8 +16,9 @@ runs:
         IFS=$'\n'
         for line in $content; do
             key=$(cut -d "=" -f1 <<< $line)
-            secret=$(cut -d "=" -f2- <<< $line)              
+            secret=$(cut -d "=" -f2- <<< $line)
+            secret=$(tr -d'\\n' <<< $secret)
             if [[ $key != DOPPLER* ]]; then echo "::add-mask::${secret}"; fi
-            echo -n "${key}=${secret}" >> $GITHUB_ENV
+            echo "${key}=${secret}" >> $GITHUB_ENV
         done
         IFS=' '
