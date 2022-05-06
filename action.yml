@@ -17,7 +17,7 @@ runs:
         for line in $content; do
             key=$(cut -d "=" -f1 <<< $line)
             secret=$(cut -d "=" -f2- <<< $line)
-            secret=$(tr -d'\\n' <<< $secret)
+            secret=$(tr -d '\\n' <<< $secret)
             if [[ $key != DOPPLER* ]]; then echo "::add-mask::${secret}"; fi
             echo "${key}=${secret}" >> $GITHUB_ENV
         done
