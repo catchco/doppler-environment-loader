@@ -4,12 +4,22 @@ inputs:
   doppler-token:
     description: "The Doppler token of the project configuration to be loaded"
     required: true
+  debug-prefix:
+    description: "The prefix to be used on variables that should not be masked"
+    required: false
+    default: "DEBUG"
+  disable-masking:
+    description: "Whether to disable all masking by the action"
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
     - name: Load Doppler secrets
       env:
         DOPPLER_TOKEN: ${{ inputs.doppler-token }}
+        DEBUG_PREFIX: ${{ inputs.debug-prefix }}
+        DISABLE_MASKING: ${{ inputs.disable-masking }}
       shell: bash
       run: |
         content=$(doppler secrets download --no-file --format env-no-quotes)
@@ -18,7 +28,7 @@ runs:
             key=$(cut -d "=" -f1 <<< $line)
             secret=$(cut -d "=" -f2- <<< $line)
             secret=$(tr -d '\\n' <<< $secret)
-            if [[ $key != DOPPLER* ]]; then echo "::add-mask::${secret}"; fi
+            if [[ $DISABLE_MASKING == 'false' && $key != DOPPLER*  && $key != $DEBUG_PREFIX* ]]; then echo "::add-mask::${secret}"; fi
             echo "${key}=${secret}" >> $GITHUB_ENV
         done
         IFS=' '
