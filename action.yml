@@ -27,7 +27,6 @@ runs:
         for line in $content; do
             key=$(cut -d "=" -f1 <<< $line)
             secret=$(cut -d "=" -f2- <<< $line)
-            secret=$(tr -d '\\n' <<< $secret)
             if [[ $DISABLE_MASKING == 'false' && $key != DOPPLER*  && $key != $DEBUG_PREFIX* ]]; then echo "::add-mask::${secret}"; fi
             echo "${key}=${secret}" >> $GITHUB_ENV
         done
